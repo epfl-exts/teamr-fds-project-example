@@ -56,18 +56,8 @@ total <- total %>%
                values_to = "value",
                cols= c(-question_id, -respondent))
 
-head(total)
+#head(total)
 ```
-
-    ## # A tibble: 6 × 4
-    ##   question_id respondent response_type    value
-    ##         <dbl> <chr>      <chr>            <dbl>
-    ## 1           0 student    totally_disagree     2
-    ## 2           0 student    disagree             9
-    ## 3           0 student    agree              111
-    ## 4           0 student    totally_agree      122
-    ## 5           1 student    totally_disagree     2
-    ## 6           1 student    disagree            30
 
 After having wrangled the data to have it in tidy format, I can respond
 to the first two questions.
@@ -94,27 +84,27 @@ total %>%
   group_by(respondent, question_id) %>%  # we group_by respondent and question_id
   summarise(total_answer = sum(value)) %>% # we calculate the total answer per question and respondent
   ungroup() %>% # we ungroup!
-  distinct(respondent, total_answer) # we keep only the unique values
+  distinct(respondent, total_answer) %>%  # we keep only the unique values
+  knitr::kable()
 ```
 
     ## `summarise()` has grouped output by 'respondent'. You can override using the
     ## `.groups` argument.
 
-    ## # A tibble: 12 × 2
-    ##    respondent total_answer
-    ##    <chr>             <dbl>
-    ##  1 professor           115
-    ##  2 professor           113
-    ##  3 professor           112
-    ##  4 professor           111
-    ##  5 professor           103
-    ##  6 student             244
-    ##  7 student             233
-    ##  8 student             234
-    ##  9 student             239
-    ## 10 student             241
-    ## 11 student             238
-    ## 12 student             230
+| respondent | total_answer |
+|:-----------|-------------:|
+| professor  |          115 |
+| professor  |          113 |
+| professor  |          112 |
+| professor  |          111 |
+| professor  |          103 |
+| student    |          244 |
+| student    |          233 |
+| student    |          234 |
+| student    |          239 |
+| student    |          241 |
+| student    |          238 |
+| student    |          230 |
 
 The answer is *No* as we can see that not all questions have been
 answered the same amount of time, for both professors and students. It
@@ -151,29 +141,7 @@ gave more answers.
 Now I am computing the mode for the students and professors for each of
 the questions.
 
-``` r
-total %>%
-  group_by(question_id, respondent) %>%
-  slice_max(order_by = value, n = 1) %>% 
-  ungroup()
-```
-
-    ## # A tibble: 64 × 4
-    ##    question_id respondent response_type value
-    ##          <dbl> <chr>      <chr>         <dbl>
-    ##  1           0 professor  totally_agree    70
-    ##  2           0 student    totally_agree   122
-    ##  3           1 professor  agree            55
-    ##  4           1 student    agree           124
-    ##  5           2 professor  agree            57
-    ##  6           2 student    agree           119
-    ##  7           3 professor  agree            55
-    ##  8           3 student    agree           138
-    ##  9           4 professor  agree            62
-    ## 10           4 student    agree            85
-    ## # ℹ 54 more rows
-
-In order to make the data nice to present in a table we can select
+In order to make the data nice to present in a table I select the
 `response_type`, `respondent` and `question_id` and use `pivot_wider()`
 so to have one line per `question_id`.
 
@@ -183,20 +151,41 @@ total %>%
   slice_max(order_by = value, n = 1) %>% # we keep the top 1 value for each group
   ungroup() %>% 
   select(-value) %>% 
-  pivot_wider(names_from = respondent, values_from = response_type)
+  pivot_wider(names_from = respondent, values_from = response_type) %>% 
+  knitr::kable()
 ```
 
-    ## # A tibble: 32 × 3
-    ##    question_id professor     student      
-    ##          <dbl> <chr>         <chr>        
-    ##  1           0 totally_agree totally_agree
-    ##  2           1 agree         agree        
-    ##  3           2 agree         agree        
-    ##  4           3 agree         agree        
-    ##  5           4 agree         agree        
-    ##  6           5 agree         agree        
-    ##  7           6 agree         agree        
-    ##  8           7 disagree      disagree     
-    ##  9           8 disagree      disagree     
-    ## 10           9 disagree      disagree     
-    ## # ℹ 22 more rows
+| question_id | professor     | student          |
+|------------:|:--------------|:-----------------|
+|           0 | totally_agree | totally_agree    |
+|           1 | agree         | agree            |
+|           2 | agree         | agree            |
+|           3 | agree         | agree            |
+|           4 | agree         | agree            |
+|           5 | agree         | agree            |
+|           6 | agree         | agree            |
+|           7 | disagree      | disagree         |
+|           8 | disagree      | disagree         |
+|           9 | disagree      | disagree         |
+|          10 | agree         | agree            |
+|          11 | agree         | agree            |
+|          12 | agree         | agree            |
+|          13 | agree         | agree            |
+|          14 | agree         | agree            |
+|          15 | totally_agree | totally_disagree |
+|          16 | totally_agree | totally_disagree |
+|          17 | agree         | totally_disagree |
+|          18 | agree         | totally_disagree |
+|          19 | agree         | totally_disagree |
+|          20 | totally_agree | totally_agree    |
+|          21 | agree         | totally_agree    |
+|          22 | totally_agree | totally_agree    |
+|          23 | disagree      | totally_agree    |
+|          24 | totally_agree | agree            |
+|          25 | agree         | agree            |
+|          26 | agree         | agree            |
+|          27 | agree         | agree            |
+|          28 | totally_agree | agree            |
+|          29 | agree         | agree            |
+|          30 | agree         | agree            |
+|          31 | agree         | disagree         |

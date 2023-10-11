@@ -63,7 +63,7 @@ total <- total %>%
                values_to = "value",
                cols= c(-question_id, -respondent))
 
-head(total)
+#head(total)
 ```
 
 After having wrangled the data to have it in tidy format, I can respond to the first two questions.
@@ -87,8 +87,8 @@ total %>%
   group_by(respondent, question_id) %>%  # we group_by respondent and question_id
   summarise(total_answer = sum(value)) %>% # we calculate the total answer per question and respondent
   ungroup() %>% # we ungroup!
-  distinct(respondent, total_answer) # we keep only the unique values
-
+  distinct(respondent, total_answer) %>%  # we keep only the unique values
+  knitr::kable()
 ```
 The answer is *No* as we can see that not all questions have been answered the same amount of time, for both professors and students. It means that some respondents left some questions unanswered. 
 
@@ -100,7 +100,7 @@ I am now comparing the distribution of answers of the students versus the profes
 
 
 
-```{r}
+```{r fig.height=8, fig.width=9}
 total %>%
   ggplot(mapping = aes(x =response_type,
                        y = value,
@@ -123,14 +123,7 @@ From this chart, we can see that basically for each question, students gave more
 
 Now I am computing the mode for the students and professors for each of the questions. 
 
-```{r}
-total %>%
-  group_by(question_id, respondent) %>%
-  slice_max(order_by = value, n = 1) %>% 
-  ungroup()
-
-```
-In order to make the data nice to present in a table we can select `response_type`, `respondent` and `question_id` and use `pivot_wider()` so to have one line per `question_id`. 
+In order to make the data nice to present in a table I select the `response_type`, `respondent` and `question_id` and use `pivot_wider()` so to have one line per `question_id`. 
 
 ```{r}
 total %>%
@@ -138,7 +131,8 @@ total %>%
   slice_max(order_by = value, n = 1) %>% # we keep the top 1 value for each group
   ungroup() %>% 
   select(-value) %>% 
-  pivot_wider(names_from = respondent, values_from = response_type)
+  pivot_wider(names_from = respondent, values_from = response_type) %>% 
+  knitr::kable()
 
 ```
 
